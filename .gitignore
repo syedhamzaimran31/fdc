@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+.DS_Store
+npm-debug.log*
+*.tsbuildinfo
+
+# Secrets: DATABASE_URL and the IP hash salt live here.
+.env
+.env*.local
+next-env.d.ts

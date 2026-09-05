@@ -1,0 +1,54 @@
+// Prisma schema for the Skyline Residences lead capture page.
+//
+// Postgres (Neon / Supabase). Set DATABASE_URL in .env — see .env.example.
+// Migrations are checked into prisma/migrations and applied with
+// `npx prisma migrate deploy`, never generated on the fly at runtime.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Budget bands the brokerage sells against. Stored as an enum rather than a
+/// free-text column so a renamed marketing label can never invalidate history.
+enum BudgetRange {
+  AED_900K_1_2M
+  AED_1_2M_1_5M
+  AED_1_5M_PLUS
+}
+
+/// Where a lead sits in the sales process. The sales team owns this field —
+/// the landing page only ever writes NEW.
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  UNQUALIFIED
+}
+
+model Lead {
+  id          String      @id @default(cuid())
+  name        String      @db.VarChar(80)
+  /// Stored lowercase and trimmed. Not unique: the same buyer legitimately
+  /// enquires twice, and silently rejecting the second attempt would look to
+  /// them like the form is broken. De-duplication is a sales-side decision.
+  email       String      @db.VarChar(255)
+  phone       String      @db.VarChar(20)
+  budgetRange BudgetRange
+  status      LeadStatus  @default(NEW)
+
+  /// Attribution captured server-side. Never trusted from the request body.
+  source      String?     @db.VarChar(120)
+  ipHash      String?     @db.VarChar(64)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([email])
+  @@index([status, createdAt])
+  @@map("leads")
+}
