@@ -1,7 +1,7 @@
 // Prisma schema for the Skyline Residences lead capture page.
 //
-// Postgres (Neon / Supabase). Set DATABASE_URL in .env — see .env.example.
-// Migrations are checked into prisma/migrations and applied with
+// Postgres (Neon / Supabase). Set DATABASE_URL and DIRECT_URL in .env — see
+// .env.example. Migrations are checked into prisma/migrations and applied with
 // `npx prisma migrate deploy`, never generated on the fly at runtime.
 
 generator client {
@@ -10,7 +10,18 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+
+  // Pooled connection (PgBouncer). Serverless functions open a connection per
+  // invocation, so the app has to go through the pooler or it exhausts the
+  // database's connection limit under any real traffic.
+  url = env("DATABASE_URL")
+
+  // Direct connection, used only by the migration engine. Migrations take
+  // advisory locks and run DDL in a session, neither of which survives a
+  // transaction-mode pooler — through PgBouncer they hang or fail outright.
+  // Falls back to DATABASE_URL when unset, so a non-pooled Postgres needs
+  // only the one variable.
+  directUrl = env("DIRECT_URL")
 }
 
 /// Budget bands the brokerage sells against. Stored as an enum rather than a

@@ -7,7 +7,7 @@ leads for an off-plan Dubai project, backed by Postgres.
 
 ```bash
 npm install
-cp .env.example .env        # then set DATABASE_URL
+cp .env.example .env        # then set DATABASE_URL and DIRECT_URL
 npm run db:deploy           # applies prisma/migrations to your database
 npm run dev                 # http://localhost:3000
 ```
@@ -20,9 +20,20 @@ npm run lint                # eslint, zero warnings
 npm run build
 ```
 
-`DATABASE_URL` is any Postgres — Neon and Supabase both work with the connection
-string they hand you. `prisma/migrations/` is checked in, so `db:deploy` builds
-the schema without anyone having to generate a migration.
+Any Postgres works; this was built and verified against Neon.
+
+**Two connection strings, on purpose.** `DATABASE_URL` is the pooled connection
+the app runs on — serverless functions open a connection per invocation, so
+without a pooler the database runs out of connections under real traffic. It
+needs `?pgbouncer=true` so Prisma stops using prepared statements, which
+PgBouncer cannot keep across queries in transaction mode. `DIRECT_URL` is the
+same database with `-pooler` removed from the host, used only by
+`prisma migrate`: migrations take advisory locks and run DDL in a session, and
+neither survives a transaction-mode pooler. On a plain Postgres, set both to
+the same value.
+
+`prisma/migrations/` is checked in, so `db:deploy` builds the schema without
+anyone having to generate a migration.
 
 ---
 
