@@ -1,42 +1,61 @@
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
-interface FieldProps {
-  /** Must match the id of the control passed as children. */
-  id: string;
-  label: string;
-  error?: string;
+import { cn } from "@/utils/cn";
+
+/**
+ * Field / FieldLabel / FieldError — shadcn's current form structure.
+ *
+ * Deliberately these primitives rather than the retired `FormField` render-prop
+ * wrapper: composing a plain label and control keeps the aria wiring visible in
+ * the markup instead of hidden inside an abstraction.
+ */
+
+export const fieldErrorId = (id: string): string => `${id}-error`;
+
+export function Field({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn("pt-7", className)} {...props} />;
+}
+
+interface FieldLabelProps extends ComponentProps<"label"> {
+  htmlFor: string;
   required?: boolean;
+}
+
+export function FieldLabel({ className, required, children, ...props }: FieldLabelProps) {
+  return (
+    <label className={cn("tag mb-2", className)} {...props}>
+      {children}
+      {/* Decorative: the requirement itself is announced via aria-required on
+          the control, so the asterisk is hidden from assistive tech. */}
+      {required ? (
+        <span className="text-primary" aria-hidden="true">
+          {" *"}
+        </span>
+      ) : null}
+    </label>
+  );
+}
+
+interface FieldErrorProps {
+  id: string;
   children: ReactNode;
 }
 
-export const errorId = (id: string): string => `${id}-error`;
-
 /**
- * Label, control and error message as one unit, so the aria wiring is written
- * once instead of on every input. The label is always visible: a placeholder
- * disappears the moment someone starts typing, which is exactly when they need
- * to check what the field was asking for.
- *
- * The asterisk is decorative — screen readers get the requirement from
- * `aria-required` on the control itself, not from a floating symbol.
+ * The filled marker carries the same meaning as the colour, so an error is
+ * never signalled by hue alone.
  */
-export function Field({ id, label, error, required, children }: FieldProps) {
+export function FieldError({ id, children }: FieldErrorProps) {
   return (
-    <div className="field">
-      <label className="field-label" htmlFor={id}>
-        {label}
-        {required ? (
-          <span className="field-required" aria-hidden="true">
-            {" *"}
-          </span>
-        ) : null}
-      </label>
-      {children}
-      {error ? (
-        <p className="field-error" id={errorId(id)}>
-          <span>{error}</span>
-        </p>
-      ) : null}
-    </div>
+    <p className="text-destructive font-data mt-2 flex gap-2 text-[0.78rem] leading-relaxed" id={id}>
+      <span
+        className="bg-destructive text-destructive-foreground mt-0.5 inline-flex h-4 w-4 flex-none
+          items-center justify-center text-[0.7rem] font-bold"
+        aria-hidden="true"
+      >
+        !
+      </span>
+      <span>{children}</span>
+    </p>
   );
 }

@@ -7,6 +7,7 @@ import { leadRepository } from "@/repositories/lead.repository";
 import { leadInputSchema } from "@/schemas/lead.schema";
 import type { ApiResponse, SubmitLeadResult } from "@/types/api";
 import { hashIp } from "@/utils/crypto";
+import { getClientIp } from "@/utils/request";
 
 // Prisma needs the Node runtime, and a lead submission is never cacheable.
 export const runtime = "nodejs";
@@ -21,9 +22,8 @@ function fail(error: string, status: number, fieldErrors?: Record<string, string
 }
 
 export async function POST(request: Request): Promise<LeadResponse> {
-  // Set by src/middleware.ts, the only place that reads the proxy headers.
-  // Used for rate limiting and attribution — never for trust.
-  const clientIp = request.headers.get("x-client-ip") ?? "unknown";
+  // Used for rate limiting and coarse attribution only — never for trust.
+  const clientIp = getClientIp(request);
 
   pruneRateLimitBuckets();
   const rateLimit = checkRateLimit(clientIp);

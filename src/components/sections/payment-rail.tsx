@@ -6,28 +6,28 @@ import { PAYMENT_PLAN } from "@/constants/project";
  * An off-plan apartment is bought on a schedule, not a price, so the schedule
  * is drawn to scale: each band's width is its share of the total. The numbers
  * carry the information; the bar makes the shape of the commitment readable at
- * a glance. It draws once on load, and not at all under reduced motion.
+ * a glance.
  */
 export function PaymentRail() {
   const total = PAYMENT_PLAN.reduce((sum, stage) => sum + stage.share, 0);
 
   return (
     <section aria-labelledby="payment-plan-heading">
-      <div className="rail-head">
+      <div className="border-border-strong flex flex-wrap items-baseline justify-between gap-2 border-b pb-3">
         <h2 className="tag" id="payment-plan-heading">
           Payment plan
         </h2>
-        <p className="rail-total">
+        <p className="font-data text-[0.8125rem]">
           {PAYMENT_PLAN.map((stage) => stage.share).join(" / ")} · interest free
         </p>
       </div>
 
       {/* Decorative: every value below is stated in text in the list. */}
-      <div className="rail-track" aria-hidden="true">
+      <div className="bg-surface border-border-strong mt-6 flex h-3.5 border" aria-hidden="true">
         {PAYMENT_PLAN.map((stage, index) => (
           <span
             key={stage.step}
-            className="rail-fill"
+            className="rail-fill bg-primary border-background h-full border-r last:border-r-0"
             style={{
               width: `${(stage.share / total) * 100}%`,
               animationDelay: `${index * 120}ms`,
@@ -36,12 +36,21 @@ export function PaymentRail() {
         ))}
       </div>
 
-      <ol className="rail-steps">
+      {/* Baselines are shared across the three cells: every share, label and
+          timing sits on the same line, which is what makes the row read as a
+          table rather than three loose stacks. */}
+      <ol className="border-border mt-6 grid list-none grid-cols-1 border-t sm:grid-cols-3">
         {PAYMENT_PLAN.map((stage) => (
-          <li className="rail-step" key={stage.step}>
-            <p className="rail-share">{stage.share}%</p>
-            <p className="rail-label">{stage.label}</p>
-            <p className="rail-timing">{stage.timing}</p>
+          <li
+            className="border-border border-b py-4 pr-4 last:border-b-0 sm:border-r sm:border-b-0
+              sm:pr-6 sm:last:border-r-0"
+            key={stage.step}
+          >
+            <p className="font-display text-[2.125rem] leading-none font-bold tracking-[-0.02em]">
+              {stage.share}%
+            </p>
+            <p className="mt-2 text-base font-semibold">{stage.label}</p>
+            <p className="text-muted-foreground font-data mt-1 text-xs">{stage.timing}</p>
           </li>
         ))}
       </ol>

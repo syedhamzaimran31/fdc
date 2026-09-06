@@ -37,21 +37,21 @@ src/
 │   ├── layout.tsx              # fonts, metadata, providers
 │   ├── page.tsx                # server component — the landing page
 │   └── api/lead/route.ts       # POST /api/lead
-├── middleware.ts               # security headers + client IP passthrough
 ├── components/
 │   ├── sections/               # Thesis, PaymentRail, FactGrid, Assurances
 │   ├── leads/                  # LeadForm, LeadConfirmation
-│   └── ui/                     # Field — the one reusable primitive
+│   └── ui/                     # shadcn primitives: Field, Input, Select, Button
 ├── hooks/          use-submit-lead.ts     # React Query mutation
 ├── services/       leads.service.ts       # the only module that knows the URL
 ├── repositories/   lead.repository.ts     # the only module that knows Prisma
 ├── schemas/        lead.schema.ts         # one Zod schema, client + server
 ├── types/          lead.ts, api.ts
 ├── lib/            api-client.ts (axios), prisma.ts, logger.ts, rate-limit.ts
-├── utils/          cn.ts, crypto.ts
+├── utils/          cn.ts, crypto.ts, request.ts
 ├── constants/      api.ts, budget-ranges.ts, project.ts
 ├── providers/      query-provider.tsx
 └── config/         site.ts
+next.config.ts                          # security headers
 prisma/
 ├── schema.prisma
 └── migrations/                 # checked in, applied with db:deploy
@@ -76,11 +76,11 @@ Moving the brokerage onto a CRM means rewriting one file.
 `postJson` also unwraps the `{ ok, data }` envelope so callers never narrow the
 union by hand.
 
-**`middleware.ts`** sets security headers on every response — one place, so a new
-route cannot ship without them — and passes the caller's IP down to the route as
-`x-client-ip`. Route handlers have no direct access to the socket address on most
-hosts. Rate limiting itself is *not* in middleware: the edge runtime has no
-database access, so anything that might need Prisma stays in the route.
+**`next.config.ts`** declares the security headers. They are static, so they do
+not need a per-request function — and Next 15.5's edge middleware throws
+`EvalError: Code generation from strings disallowed` under `next start` on
+Node 24, 500-ing every request. That failure does not appear in `next dev`,
+which is exactly why the production build is part of the check list.
 
 **`types/api.ts`** defines `ApiResponse<T>` as a discriminated union
 (`{ok: true, data}` | `{ok: false, error}`). A caller cannot read `data` without

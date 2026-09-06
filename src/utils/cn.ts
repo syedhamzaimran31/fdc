@@ -1,10 +1,11 @@
-type ClassValue = string | false | null | undefined;
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 /**
- * Joins conditional class names. Deliberately dependency-free: this project
- * uses plain CSS with design tokens, so there are no Tailwind classes to merge
- * and `clsx` + `tailwind-merge` would be two dependencies doing one join.
+ * Merges class names and resolves Tailwind conflicts, so a variant's default
+ * can always be overridden by a caller's `className` instead of the two
+ * fighting over specificity.
  */
-export function cn(...classes: ClassValue[]): string {
-  return classes.filter(Boolean).join(" ");
+export function cn(...inputs: ClassValue[]): string {
+  return twMerge(clsx(inputs));
 }
