@@ -308,6 +308,33 @@ Each of these passed `typecheck`, `lint` and `build` first.
 
 ---
 
+## 10. Deployment
+
+`3b2b98e` onward
+
+Built for Vercel; `docs/DEPLOY.md` has the steps. Not GitHub Pages — Pages is
+static only, and this needs a server for `POST /api/lead` and for Prisma to
+reach Postgres. `npm run build` now runs `prisma generate` first so the client
+exists in the deployed bundle.
+
+**Demo mode.** With `DATABASE_URL` unset the app no longer 500s: the repository
+falls through to an in-memory store (mirrored to `data/leads.json` when the
+filesystem allows), so a reviewer can clone and use the form without
+provisioning Postgres.
+
+It is gated, logged and visible rather than silent, and that is the whole point.
+On a serverless host the filesystem is read-only apart from a per-instance
+`/tmp`, so a JSON write there can vanish with no error — a `200 OK` and a lost
+lead, which is exactly the bug in §1.1 wearing a nicer face. So demo mode warns
+once in the server log and the page renders a notice saying enquiries are not
+being saved. If it is ever on in production it is obvious immediately.
+
+Verified both ways: built and run with `.env` removed — banner shown, form
+submits, no 500, warning logged; then restored — banner gone, lead written to
+Neon.
+
+---
+
 ## Known gaps
 
 Honest list, all covered in the README's handover note:

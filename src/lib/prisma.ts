@@ -4,12 +4,17 @@ import { PrismaClient } from "@prisma/client";
 // until Postgres refuses connections.
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
-  });
+/**
+ * Constructed on first use, not at import. Without a DATABASE_URL the client
+ * cannot be built, and this module is reachable from a request path that is
+ * allowed to run without one — see lib/demo-store.ts.
+ */
+export function getPrisma(): PrismaClient {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = new PrismaClient({
+      log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
+    });
+  }
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+  return globalForPrisma.prisma;
 }

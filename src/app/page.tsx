@@ -4,6 +4,7 @@ import { FactGrid } from "@/components/sections/fact-grid";
 import { PaymentRail } from "@/components/sections/payment-rail";
 import { Thesis } from "@/components/sections/thesis";
 import { PROJECT } from "@/constants/project";
+import { isDatabaseConfigured } from "@/lib/env";
 
 /**
  * The two-column split starts at xl, not lg: between 1024 and 1280 both
@@ -75,6 +76,20 @@ export default function HomePage() {
               All four fields are required. An advisor calls you back within one business day
               with the current availability for your band.
             </p>
+
+            {/* Evaluated at build time. Without a database the endpoint still answers,
+                but nothing is durably stored, so the page has to say so rather than
+                show a confirmation that means nothing. */}
+            {!isDatabaseConfigured ? (
+              <p
+                className="border-destructive bg-destructive-surface text-destructive font-data mt-5
+                  border-l-4 px-4 py-3 text-xs leading-relaxed"
+                role="status"
+              >
+                Demo mode: DATABASE_URL is not set, so enquiries are held in memory and are not
+                saved. Set it in .env to store leads properly.
+              </p>
+            ) : null}
 
             <LeadForm />
 

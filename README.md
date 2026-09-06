@@ -41,6 +41,12 @@ the same value.
 `prisma/migrations/` is checked in, so `db:deploy` builds the schema without
 anyone having to generate a migration.
 
+**Running without a database.** With `DATABASE_URL` unset the app does not fail:
+the endpoint answers, leads are held in memory, and the page shows a demo-mode
+notice. That is a convenience for reviewing the repo, not a second way to run it —
+`src/lib/demo-store.ts` explains why, and
+[docs/DEPLOY.md](./docs/DEPLOY.md) covers deploying it properly on Vercel + Neon.
+
 ---
 
 ## Architecture

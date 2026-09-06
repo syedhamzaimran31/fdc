@@ -3,7 +3,9 @@ import "server-only";
 import type { BudgetRange as PrismaBudgetRange } from "@prisma/client";
 
 import type { BudgetRange } from "@/constants/budget-ranges";
-import { prisma } from "@/lib/prisma";
+import { demoStore } from "@/lib/demo-store";
+import { isDatabaseConfigured } from "@/lib/env";
+import { getPrisma } from "@/lib/prisma";
 import type { Lead, LeadCreateInput } from "@/types/lead";
 
 /**
@@ -16,10 +18,18 @@ const _prismaMatchesBudget: BudgetRange = null as unknown as PrismaBudgetRange;
 void _budgetMatchesPrisma;
 void _prismaMatchesBudget;
 
-/** The only module that touches Prisma. Swapping in a CRM is this file alone. */
+/**
+ * The only module that touches Prisma. Swapping in a CRM is this file alone.
+ *
+ * Without DATABASE_URL it falls through to the demo store so the endpoint still
+ * answers — see lib/demo-store.ts for why that is a development affordance and
+ * not a second way to run this in production.
+ */
 export const leadRepository = {
   async create(input: LeadCreateInput): Promise<Lead> {
-    const lead = await prisma.lead.create({
+    if (!isDatabaseConfigured) return demoStore.create(input);
+
+    const lead = await getPrisma().lead.create({
       data: {
         name: input.name,
         email: input.email,
@@ -34,7 +44,9 @@ export const leadRepository = {
   },
 
   async listRecent(limit = 50): Promise<Lead[]> {
-    const leads = await prisma.lead.findMany({
+    if (!isDatabaseConfigured) return demoStore.listRecent(limit);
+
+    const leads = await getPrisma().lead.findMany({
       orderBy: { createdAt: "desc" },
       take: limit,
     });
