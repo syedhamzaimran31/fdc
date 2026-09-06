@@ -57,7 +57,9 @@ export async function POST(request: Request): Promise<LeadResponse> {
 
   const { referenceCode, ...lead } = parsed.data;
 
-
+  // Flagged, never discarded. This used to drop the submission outright, and a
+  // single false positive then destroyed a real buyer with no trace. A spam
+  // heuristic on a lead form has to fail towards keeping the lead.
   const suspectedBot = Boolean(referenceCode);
 
   try {

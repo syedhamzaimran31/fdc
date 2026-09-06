@@ -209,9 +209,8 @@ export function LeadForm() {
         />
       </Field>
 
-      {/* Honeypot. The name must not map to a Chrome autofill profile field:
-          "company" did, so Chrome filled it from the visitor's saved profile
-          and real submissions were being flagged as bots. */}
+      {/* Honeypot. Do not rename to company/organisation: Chrome autofills
+          those from a saved profile and real buyers get flagged as bots. */}
       <div className="honeypot" aria-hidden="true">
         <label htmlFor="referenceCode">Reference code</label>
         <input
