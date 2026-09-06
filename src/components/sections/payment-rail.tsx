@@ -23,7 +23,7 @@ export function PaymentRail() {
       </div>
 
       {/* Decorative: every value below is stated in text in the list. */}
-      <div className="bg-surface border-border-strong mt-6 flex h-3.5 border" aria-hidden="true">
+      <div className="bg-surface border-border-strong mt-5 flex h-3.5 border" aria-hidden="true">
         {PAYMENT_PLAN.map((stage, index) => (
           <span
             key={stage.step}
@@ -36,14 +36,14 @@ export function PaymentRail() {
         ))}
       </div>
 
-      {/* Baselines are shared across the three cells: every share, label and
-          timing sits on the same line, which is what makes the row read as a
-          table rather than three loose stacks. */}
-      <ol className="border-border mt-6 grid list-none grid-cols-1 border-t sm:grid-cols-3">
+      {/* Cells are padded on both sides, not just the right: the dividers are
+          the right border of the previous cell, so without a left inset the
+          next cell's figures sit hard against the rule. */}
+      <ol className="border-border mt-5 grid list-none grid-cols-1 border-t sm:grid-cols-3">
         {PAYMENT_PLAN.map((stage) => (
           <li
-            className="border-border border-b py-4 pr-4 last:border-b-0 sm:border-r sm:border-b-0
-              sm:pr-6 sm:last:border-r-0"
+            className="border-border border-b py-4 last:border-b-0 sm:border-r sm:border-b-0
+              sm:px-6 sm:first:pl-0 sm:last:border-r-0 sm:last:pr-0"
             key={stage.step}
           >
             <p className="font-display text-[2.125rem] leading-none font-bold tracking-[-0.02em]">

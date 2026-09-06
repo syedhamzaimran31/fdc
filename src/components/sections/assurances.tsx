@@ -15,10 +15,10 @@ export function Assurances() {
         Terms worth knowing
       </h2>
 
-      <dl className="mt-4">
+      <dl className="mt-3">
         {ASSURANCES.map((item) => (
           <div
-            className="border-border grid grid-cols-1 gap-2 border-t py-6 sm:grid-cols-[13rem_minmax(0,1fr)]
+            className="border-border grid grid-cols-1 gap-2 border-t py-5 sm:grid-cols-[13rem_minmax(0,1fr)]
               sm:gap-8"
             key={item.label}
           >

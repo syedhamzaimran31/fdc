@@ -17,7 +17,7 @@ export function FactGrid() {
 
       {/* A 1px gap over a border-coloured background draws the grid rules
           without every cell needing its own border and a de-duplication rule. */}
-      <dl className="bg-border border-border mt-4 grid grid-cols-2 gap-px border">
+      <dl className="bg-border border-border mt-3 grid grid-cols-2 gap-px border">
         {PROJECT_FACTS.map((fact) => (
           <div className="bg-background flex flex-col p-4" key={fact.label}>
             <dt className="tag min-h-8">{fact.label}</dt>

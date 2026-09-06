@@ -28,8 +28,8 @@ export function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        "border-border-strong flex h-12 w-full items-center justify-between",
-        "rounded-none border-0 border-b-[1.5px] bg-transparent px-0 py-2",
+        "border-border-strong flex h-11 w-full items-center justify-between",
+        "rounded-none border-0 border-b-[1.5px] bg-transparent px-0 py-1",
         "text-left text-[1.0625rem] text-foreground",
         "transition-colors duration-200",
         "data-[placeholder]:text-muted-foreground/70",

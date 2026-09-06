@@ -6,7 +6,13 @@ import { Controller, useForm } from "react-hook-form";
 
 import { LeadConfirmation } from "@/components/leads/lead-confirmation";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldLabel, fieldErrorId } from "@/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldHeader,
+  FieldLabel,
+  fieldErrorId,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -25,6 +31,9 @@ const FIELD_LABELS: Record<string, string> = {
   phone: "Phone",
   budgetRange: "Budget band",
 };
+
+const NOTICE_CLASS =
+  "bg-destructive-surface border-destructive text-destructive mt-5 border-l-4 px-4 py-3 text-[0.9375rem]";
 
 export function LeadForm() {
   const submitLead = useSubmitLead();
@@ -88,15 +97,9 @@ export function LeadForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       {showSummary ? (
-        <div
-          className="bg-destructive-surface border-destructive text-destructive mt-6 border-l-4 p-4
-            text-[0.9375rem]"
-          ref={summaryRef}
-          tabIndex={-1}
-          role="alert"
-        >
+        <div className={NOTICE_CLASS} ref={summaryRef} tabIndex={-1} role="alert">
           <strong>{errorEntries.length} fields need attention.</strong>
-          <ul className="mt-2 list-disc pl-4 text-sm">
+          <ul className="mt-1.5 list-disc pl-4 text-sm">
             {errorEntries.map(([name, error]) => (
               <li key={name}>
                 <a className="underline" href={`#${name}`}>
@@ -109,19 +112,20 @@ export function LeadForm() {
       ) : null}
 
       {submitLead.isError ? (
-        <div
-          className="bg-destructive-surface border-destructive text-destructive mt-6 border-l-4 p-4
-            text-[0.9375rem]"
-          role="alert"
-        >
+        <div className={NOTICE_CLASS} role="alert">
           {submitLead.error.message}
         </div>
       ) : null}
 
       <Field>
-        <FieldLabel htmlFor="name" required>
-          Full name
-        </FieldLabel>
+        <FieldHeader>
+          <FieldLabel htmlFor="name" required>
+            Full name
+          </FieldLabel>
+          {errors.name ? (
+            <FieldError id={fieldErrorId("name")}>{errors.name.message}</FieldError>
+          ) : null}
+        </FieldHeader>
         <Input
           id="name"
           type="text"
@@ -131,15 +135,17 @@ export function LeadForm() {
           aria-describedby={errors.name ? fieldErrorId("name") : undefined}
           {...register("name")}
         />
-        {errors.name ? (
-          <FieldError id={fieldErrorId("name")}>{errors.name.message}</FieldError>
-        ) : null}
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="email" required>
-          Email
-        </FieldLabel>
+        <FieldHeader>
+          <FieldLabel htmlFor="email" required>
+            Email
+          </FieldLabel>
+          {errors.email ? (
+            <FieldError id={fieldErrorId("email")}>{errors.email.message}</FieldError>
+          ) : null}
+        </FieldHeader>
         <Input
           id="email"
           type="email"
@@ -150,15 +156,17 @@ export function LeadForm() {
           aria-describedby={errors.email ? fieldErrorId("email") : undefined}
           {...register("email")}
         />
-        {errors.email ? (
-          <FieldError id={fieldErrorId("email")}>{errors.email.message}</FieldError>
-        ) : null}
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="phone" required>
-          Phone
-        </FieldLabel>
+        <FieldHeader>
+          <FieldLabel htmlFor="phone" required>
+            Phone
+          </FieldLabel>
+          {errors.phone ? (
+            <FieldError id={fieldErrorId("phone")}>{errors.phone.message}</FieldError>
+          ) : null}
+        </FieldHeader>
         <Input
           id="phone"
           type="tel"
@@ -170,17 +178,19 @@ export function LeadForm() {
           aria-describedby={errors.phone ? fieldErrorId("phone") : undefined}
           {...register("phone")}
         />
-        {errors.phone ? (
-          <FieldError id={fieldErrorId("phone")}>{errors.phone.message}</FieldError>
-        ) : null}
       </Field>
 
       {/* Radix Select is not a native input, so it is driven by Controller
           rather than register — the current shadcn form pattern. */}
       <Field>
-        <FieldLabel htmlFor="budgetRange" required>
-          Budget band
-        </FieldLabel>
+        <FieldHeader>
+          <FieldLabel htmlFor="budgetRange" required>
+            Budget band
+          </FieldLabel>
+          {errors.budgetRange ? (
+            <FieldError id={fieldErrorId("budgetRange")}>{errors.budgetRange.message}</FieldError>
+          ) : null}
+        </FieldHeader>
         <Controller
           control={control}
           name="budgetRange"
@@ -192,9 +202,7 @@ export function LeadForm() {
                 onBlur={field.onBlur}
                 aria-required="true"
                 aria-invalid={Boolean(errors.budgetRange)}
-                aria-describedby={
-                  errors.budgetRange ? fieldErrorId("budgetRange") : undefined
-                }
+                aria-describedby={errors.budgetRange ? fieldErrorId("budgetRange") : undefined}
               >
                 <SelectValue placeholder="Select a band" />
               </SelectTrigger>
@@ -208,9 +216,6 @@ export function LeadForm() {
             </Select>
           )}
         />
-        {errors.budgetRange ? (
-          <FieldError id={fieldErrorId("budgetRange")}>{errors.budgetRange.message}</FieldError>
-        ) : null}
       </Field>
 
       {/* Honeypot: off-screen and untabbable, so only a bot fills it. */}
@@ -219,7 +224,7 @@ export function LeadForm() {
         <input id="company" type="text" tabIndex={-1} autoComplete="off" {...register("company")} />
       </div>
 
-      <Button className="mt-8" type="submit" disabled={isBusy}>
+      <Button className="mt-7" type="submit" disabled={isBusy}>
         {isBusy ? "Sending…" : "Request a callback"}
       </Button>
     </form>

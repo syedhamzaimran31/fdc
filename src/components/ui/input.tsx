@@ -4,15 +4,16 @@ import { cn } from "@/utils/cn";
 
 /**
  * A control ruled on a baseline rather than boxed — a line on a signed
- * document, not a floating field. Height is 3rem so the target clears the
- * 44px minimum with the label and error still in one rhythm.
+ * document, not a floating field. 2.75rem tall: still a 44px touch target,
+ * but tight enough that the value does not float in a void between its label
+ * and its rule.
  */
 export function Input({ className, ...props }: ComponentProps<"input">) {
   return (
     <input
       className={cn(
-        "border-border-strong h-12 w-full rounded-none border-0 border-b-[1.5px]",
-        "bg-transparent px-0 py-2 text-[1.0625rem] text-foreground",
+        "border-border-strong h-11 w-full rounded-none border-0 border-b-[1.5px]",
+        "bg-transparent px-0 py-1 text-[1.0625rem] text-foreground",
         "placeholder:text-muted-foreground/70",
         "transition-colors duration-200",
         "hover:border-b-foreground",
