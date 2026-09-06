@@ -11,22 +11,22 @@ export const leadInputSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(2, "Please enter your full name.")
-    .max(80, "That name looks too long."),
+    .min(2, "Enter your full name")
+    .max(80, "Name is too long"),
   email: z
     .string()
     .trim()
     .toLowerCase()
-    .min(1, "Please enter your email address.")
-    .email("Please enter a valid email address."),
+    .min(1, "Required")
+    .email("Enter a valid email"),
   phone: z
     .string()
     .trim()
     // Deliberately permissive: buyers arrive with all sorts of formats and a
     // rejected real lead costs far more than a slightly messy one.
-    .regex(/^\+?[0-9\s()-]{7,20}$/, "Please enter a valid phone number."),
+    .regex(/^\+?[0-9\s()-]{7,20}$/, "Enter a valid number"),
   budgetRange: z.enum(BUDGET_RANGE_VALUES, {
-    errorMap: () => ({ message: "Please choose a budget range." }),
+    errorMap: () => ({ message: "Choose a band" }),
   }),
   /**
    * Honeypot. Real people never see this field, so anything in it is a bot.

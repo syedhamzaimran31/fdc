@@ -75,14 +75,14 @@ export default function HomePage() {
           the form when it is over the form, and the page everywhere else.
         */}
         <div
-          className="row-start-1 xl:row-start-auto xl:sticky xl:top-8 xl:-mt-9 xl:self-start
-            xl:max-h-[calc(100dvh-4rem)] xl:overflow-y-auto xl:overscroll-contain
-            xl:[scrollbar-width:thin]"
+          className="panel-scroll row-start-1 xl:row-start-auto xl:sticky xl:top-8 xl:-mt-9
+            xl:self-start xl:max-h-[calc(100dvh-4rem)] xl:overflow-y-auto xl:overscroll-contain
+            xl:border xl:border-foreground xl:bg-surface"
         >
           <section
             className="bg-surface border-foreground -mx-5 border-y px-5 py-7
               sm:mx-auto sm:w-full sm:max-w-[36rem] sm:border sm:px-8
-              xl:mx-0 xl:max-w-none"
+              xl:mx-0 xl:max-w-none xl:border-0 xl:bg-transparent xl:pr-6"
             id="enquiry"
             aria-labelledby="enquiry-heading"
           >
@@ -94,8 +94,8 @@ export default function HomePage() {
               Get the price list and floor plates.
             </h2>
             <p className="text-muted-foreground border-border mt-2 border-b pb-5 text-base">
-              Four fields. An advisor calls you back within one business day with the current
-              availability for your band.
+              All four fields are required. An advisor calls you back within one business day
+              with the current availability for your band.
             </p>
 
             <LeadForm />

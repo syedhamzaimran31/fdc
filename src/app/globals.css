@@ -132,6 +132,36 @@
   }
 }
 
+@layer components {
+  /* The enquiry panel scrolls its own content when it is taller than the
+     viewport. The default scrollbar is a fat grey slab that reads as browser
+     chrome dropped inside a designed panel, so it is thinned and recoloured to
+     the page's own rule colour. scrollbar-gutter keeps the track's width
+     reserved, so content does not shift the moment the bar appears. */
+  .panel-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+    scrollbar-gutter: stable;
+  }
+
+  /* WebKit still ignores scrollbar-color, so it gets the same treatment. */
+  .panel-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .panel-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .panel-scroll::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+  }
+
+  .panel-scroll:hover::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground);
+  }
+}
+
 @layer utilities {
   /* Off-screen rather than display:none, which some bots are built to skip. */
   .honeypot {

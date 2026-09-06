@@ -119,7 +119,7 @@ export function LeadForm() {
 
       <Field>
         <FieldHeader>
-          <FieldLabel htmlFor="name" required>
+          <FieldLabel htmlFor="name" invalid={Boolean(errors.name)}>
             Full name
           </FieldLabel>
           {errors.name ? (
@@ -139,7 +139,7 @@ export function LeadForm() {
 
       <Field>
         <FieldHeader>
-          <FieldLabel htmlFor="email" required>
+          <FieldLabel htmlFor="email" invalid={Boolean(errors.email)}>
             Email
           </FieldLabel>
           {errors.email ? (
@@ -160,7 +160,7 @@ export function LeadForm() {
 
       <Field>
         <FieldHeader>
-          <FieldLabel htmlFor="phone" required>
+          <FieldLabel htmlFor="phone" invalid={Boolean(errors.phone)}>
             Phone
           </FieldLabel>
           {errors.phone ? (
@@ -184,7 +184,7 @@ export function LeadForm() {
           rather than register — the current shadcn form pattern. */}
       <Field>
         <FieldHeader>
-          <FieldLabel htmlFor="budgetRange" required>
+          <FieldLabel htmlFor="budgetRange" invalid={Boolean(errors.budgetRange)}>
             Budget band
           </FieldLabel>
           {errors.budgetRange ? (

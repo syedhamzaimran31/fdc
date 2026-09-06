@@ -171,7 +171,12 @@ Not an afterthought, and checked rather than assumed:
   wired through one `Field` primitive.
 - Inline error under each field, **plus** a focused error summary when a submit
   fails with more than one error — links jump to the offending field.
-- Errors are never colour alone: each carries a filled `!` marker.
+- Errors are never colour alone: the message is words ("Enter a valid email"),
+  and the field label turns red alongside it, so the state is carried by text
+  and position rather than hue.
+- Every field is required, so the form says that once above the first field
+  rather than repeating an asterisk four times. `aria-required` is still set per
+  control.
 - Body text 4.5:1 or better; every touch target ≥44px; `text-size-adjust` and
   pinch-zoom left alone.
 - Single animation, disabled under reduced motion.
