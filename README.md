@@ -3,6 +3,10 @@
 FDC skills task submission. A Next.js (App Router) landing page that captures buyer
 leads for an off-plan Dubai project, backed by Postgres.
 
+A full record of every change and the reasoning behind it is in
+[CHANGELOG.md](./CHANGELOG.md). Parts 2 to 5 of the task are answered at the bottom
+of this file.
+
 ## Run it
 
 ```bash
@@ -219,10 +223,13 @@ The brief said keep the scope tight, so these were conscious noes:
 
 - **No Zustand.** There is no global state on this page. One form owns its own
   state. A store would be architecture for its own sake.
-- **No Tailwind, no component library.** The design is a bespoke token system in
-  one stylesheet, which is both smaller and more specific to this page than a
-  utility framework plus a component kit would be. There is exactly one shared UI
-  primitive (`Field`) because that is how many the page needs.
+- **Tailwind and shadcn, but only four primitives.** The tokens carry the design
+  rather than the framework: every colour is a semantic OKLCH variable and no
+  component names one. What I did not do is pull in a component kit wholesale —
+  the page needs `Field`, `Input`, `Select` and `Button`, so those are the four
+  that exist. Radix Select earns its place because a native select cannot be
+  styled consistently across browsers, and its default chrome is a real part of
+  what reads as templated.
 - **React Query for one mutation.** `useState` would technically do. `useMutation`
   removes the hand-rolled loading/error/success bookkeeping that the starter got
   wrong, and keeps the component → hook → service layering intact.
@@ -359,42 +366,69 @@ are exactly where that fails.
 
 ## Part 3 — How I used AI
 
-I used Claude Code throughout, the way I normally work: I decided the architecture and
-the trade-offs, and used the tool to move fast on the parts where speed is safe.
+I used Claude Code throughout, the way I would on the job: I decided the architecture
+and the trade-offs, and used the tool to move fast on the parts where being wrong is
+cheap.
 
-**What I trusted it with.** Mechanical, verifiable work — converting JS to TypeScript,
-scaffolding the folder structure, wiring react-hook-form to `zodResolver`, the
-boilerplate around Open Graph metadata. If any of that is wrong, the compiler or the
-browser tells me immediately, so the cost of being wrong is near zero.
+**What I trusted it with.** Mechanical, verifiable work — converting the starter from
+JavaScript to TypeScript, scaffolding the folder structure, wiring react-hook-form to
+`zodResolver`, Open Graph boilerplate, Tailwind class runs. If any of that is wrong the
+compiler or the browser says so immediately, so the cost of a mistake is a few seconds.
 
-**What I did not trust, and checked myself.** Three specific things:
+**What I did not trust.** Anything whose failure is *silent*. Four things I checked by
+running them rather than reading them:
 
-1. **The concurrency fix.** (This was against the file store the starter shipped,
-   before I replaced it with Postgres — the reasoning is the point.) The first
-   instinct was to `await` the
-   save and move on. That fixes the silent failure but not the race — two simultaneous
-   submissions still read the same array and one overwrites the other. I did not accept
-   "it is awaited now" as done. I wrote the write-queue myself and then proved it,
-   firing 12 concurrent POSTs at `/api/lead` and counting records on disk: 12 in, 12
-   stored. Before the fix, that test loses leads. This is the kind of bug that never
-   shows up in manual testing and costs a client real money.
+1. **`npm start` was completely broken and nothing said so.** The middleware I had
+   written type-checked, linted, built, and worked perfectly under `next dev`. Against a
+   production build it threw `EvalError: Code generation from strings disallowed` on
+   every request — Next 15.5's edge runtime on Node 24 — so the site 500-ed. Four green
+   checks and a working dev server, and the thing was unshippable. I only found it
+   because I stopped testing against the dev server and ran the real build. The fix was
+   also the better design: those headers are static, so they belong in
+   `next.config.ts`, which needs no runtime at all, and the API route can read
+   `x-forwarded-for` itself. Middleware deleted.
 
-2. **The honeypot behaviour.** The first version validated the honeypot with
-   `z.string().max(0)`, which meant a bot got a `422` naming the trap field — telling it
-   exactly which field to leave empty next time. I only caught it because I POSTed to
-   the endpoint with the honeypot filled and read the actual response body instead of
-   assuming. Changed to accept silently with a `202` and discard the submission.
+2. **Tailwind was compiling a different project's classes into my CSS.** The page looked
+   half-styled and I could have spent an hour guessing at class names. Instead I fetched
+   the generated stylesheet and grepped it: it contained `border-zinc-200` and
+   `max-w-[1120px]`, which exist nowhere in this repo, while `max-w-shell` and
+   `border-y` were missing. Tailwind v4 resolves auto-detected sources against the
+   *working directory*, not the project root, so it had scanned the wrong folder
+   entirely. An explicit `@source` pins it and makes the build identical wherever it is
+   invoked. Reading the compiled output instead of re-reading my own source is what
+   turned a mystery into a one-line fix.
 
-3. **Whether to add the suggested tooling at all.** Asked for a "proper" structure, the
-   tool will happily reach for Zustand, Tailwind and a component library. None of those
-   solve a problem this page has. I kept React Query because it removes the exact
-   bookkeeping the starter got wrong, and dropped the rest. Deciding what *not* to
-   install is the part the tool cannot do for you.
+3. **An accessibility feature that did nothing.** After a failed submit with several
+   errors, focus is supposed to move to the error summary. The code looked right —
+   `requestAnimationFrame(() => summaryRef.current?.focus())` — and I nearly left it. I
+   asserted it instead: `document.activeElement === summary` returned **false**. The
+   callback fired before React had committed the summary, so there was nothing to focus.
+   Moved to an effect keyed on `submitCount`. An accessibility affordance that silently
+   does nothing is worse than not claiming it, because nobody tests it again.
 
-The rule I work to: AI is fast at writing plausible code and bad at knowing when
-plausible is not correct. So anything touching data integrity, money or user trust gets
-read line by line and tested against a real running server — not accepted because it
-looks right.
+4. **The honeypot was teaching bots how to pass.** My first version validated it with
+   `z.string().max(0)`, so a bot that filled the trap got a `422` naming the exact field
+   to leave empty next time. I caught it by POSTing to the endpoint with the honeypot
+   filled and reading the actual response body rather than assuming the shape. Now it
+   returns `202` and silently discards.
+
+There is a fifth that is not about code. Setting up Neon, the connection string went
+into `.env.example` — which is committed. I checked `git log -S` before committing:
+it had not reached history, so it was a one-line fix rather than a rewrite. Secrets are
+worth a ten-second check every single time, because the recovery cost is asymmetric.
+
+**Where I overrode it.** Asked for a "proper" structure, the tool reaches for Zustand,
+a component library, and a store for everything. There is no global state on this page —
+one form owns its own state — so Zustand is architecture for its own sake and I left it
+out. React Query stayed for exactly one reason: it removes the loading/error/success
+bookkeeping the starter got wrong in the first place. Deciding what *not* to install is
+the part the tool cannot do for you.
+
+The rule underneath all of it: AI is fast at producing plausible code and bad at knowing
+when plausible is not correct. Fluent code gets read less carefully, not more. So
+anything touching data integrity, money, or a promise made to a user gets tested against
+something real — a production build, a live database, the actual rendered DOM — and not
+accepted because it looks right.
 
 ---
 
