@@ -93,10 +93,7 @@ export default function HomePage() {
 
             <LeadForm />
 
-            <p className="text-muted-foreground font-data mt-4 text-xs leading-relaxed">
-              We use your details to call you about {PROJECT.name} and nothing else. No list, no
-              resale, no drip campaign.
-            </p>
+            
           </section>
         </div>
       </main>
