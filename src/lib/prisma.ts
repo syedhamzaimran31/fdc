@@ -1,10 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
-/**
- * Next.js hot-reloads modules in development, which would otherwise open a new
- * connection pool on every save until Postgres refuses new connections. Caching
- * the client on globalThis is the documented workaround.
- */
+// Cached on globalThis: without it, hot reload opens a new pool on every save
+// until Postgres refuses connections.
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 export const prisma =

@@ -4,14 +4,7 @@ interface LogContext {
   [key: string]: unknown;
 }
 
-/**
- * Thin structured-logging wrapper. It exists so that swapping console for a
- * real sink (Axiom, Datadog, Sentry) is one file, and so that log lines are
- * greppable JSON rather than free-form strings.
- *
- * Never log a full lead: names, emails and phone numbers are personal data and
- * do not belong in a log aggregator. Log the id and the outcome.
- */
+/** Never log a full lead — contact details are personal data. Log ids. */
 function write(level: LogLevel, scope: string, message: string, context?: LogContext): void {
   const entry = {
     level,

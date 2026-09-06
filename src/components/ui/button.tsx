@@ -12,21 +12,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // The page's one saturated field. Used for the single primary action.
         primary: cn(
           "bg-primary text-primary-foreground font-display font-bold uppercase tracking-[0.04em]",
           "hover:bg-primary-hover disabled:bg-muted-foreground disabled:cursor-progress",
         ),
-        // A ruled text link, for the one secondary action on the page.
         link: cn(
           "text-primary font-data border-b-[1.5px] border-primary px-0",
           "hover:text-primary-hover hover:border-primary-hover",
         ),
       },
       size: {
-        // 3.5rem keeps the primary action comfortably above the touch minimum.
         lg: "min-h-14 w-full px-4 py-4 text-base",
-        // Text links still need a 44px target even though the ink is small.
+        // Small ink, but still a 44px target.
         inline: "min-h-11 text-[0.8125rem]",
       },
     },

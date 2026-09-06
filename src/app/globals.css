@@ -1,54 +1,28 @@
 @import "tailwindcss";
 
-/* Scan this project explicitly. Tailwind v4 auto-detection resolves sources
-   against the working directory, which is not necessarily the project root
-   (monorepos, or any runner started from elsewhere). Naming the directory
-   makes the generated CSS identical no matter where the build is invoked. */
+/* Tailwind v4 resolves auto-detected sources against the working directory, not
+   the project root. Started from elsewhere it compiles a different project's
+   classes; naming the directory makes the output identical wherever it runs. */
 @source "../../src";
 
-/* ===========================================================================
-   Skyline Residences — design tokens
-   ---------------------------------------------------------------------------
-   Direction: an off-plan purchase is a milestone-based payment obligation on a
-   building that does not exist yet. So the page is set as a term sheet, not a
-   brochure — drafting-paper ground, ink text, tabular figures, and one
-   saturated ultramarine used as a flat field rather than as decoration.
-
-   Two layers, deliberately:
-     :root      — raw palette + semantic surface/foreground pairs (OKLCH)
-     @theme     — maps those semantics onto Tailwind utilities
-   Components use utilities only. No component ever names a colour.
-   =========================================================================== */
-
 :root {
-  /* -- Surfaces and text --------------------------------------------------- */
-  /* Cool drafting stock, deliberately not the warm cream every generated
-     landing page reaches for. */
   --background: oklch(0.913 0.005 128);
   --foreground: oklch(0.196 0.008 265);
 
-  /* The raised sheet the enquiry form is printed on. */
   --surface: oklch(0.968 0.003 106);
   --surface-foreground: oklch(0.196 0.008 265);
 
   --muted-foreground: oklch(0.396 0.011 260);
 
-  /* -- The one signal colour ---------------------------------------------- */
   --primary: oklch(0.412 0.243 267);
   --primary-foreground: oklch(1 0 0);
   --primary-hover: oklch(0.323 0.196 267);
 
-  /* -- Rules ---------------------------------------------------------------
-     Two weights. The hairline separates cells in the spec grid, where every
-     value is already conveyed in text — a decorative divider, not a state
-     indicator, so WCAG 1.4.11 does not bind it.
-     The strong rule IS the boundary of every form control (the fields are
-     ruled, not boxed), so it has to clear 3:1 against the sheet it sits on.
-     Measured: 3.16:1 on the sheet, 2.71:1 -> 3.4:1 on paper. */
   --border: oklch(0.806 0.011 122);
+  /* The fields are ruled, not boxed, so this line IS a control boundary and has
+     to clear WCAG 1.4.11's 3:1. Measured 4.39:1 on the sheet. */
   --border-strong: oklch(0.552 0.008 130);
 
-  /* -- Feedback ------------------------------------------------------------ */
   --destructive: oklch(0.452 0.176 27);
   --destructive-surface: oklch(0.926 0.031 24);
   --destructive-foreground: oklch(0.968 0.003 106);
@@ -56,9 +30,6 @@
 
   --ring: var(--primary);
 
-  /* -- Radius -------------------------------------------------------------- */
-  /* A term sheet has no rounded corners. Kept as a token so the decision is
-     visible and reversible rather than absent. */
   --radius: 0px;
 }
 
@@ -79,16 +50,14 @@
   --color-success: var(--success);
   --color-ring: var(--ring);
 
-  /* Three faces, three jobs. Bound to next/font variables in layout.tsx. */
   --font-display: var(--font-archivo), "Arial Narrow", system-ui, sans-serif;
   --font-body: var(--font-serif), Georgia, "Times New Roman", serif;
   --font-data: var(--font-mono), "SFMono-Regular", Consolas, monospace;
 
   --radius-sheet: var(--radius);
 
-  /* The page shell. max-w-shell resolves from the --container-* namespace,
-     and every full-width band uses it so the left and right gutters can never
-     drift apart. */
+  /* Must live in --container-*: that is the namespace max-w-* reads. Naming it
+     --spacing-shell silently breaks the whole spacing scale. */
   --container-shell: 80rem;
 }
 
@@ -112,39 +81,29 @@
     @apply bg-background text-foreground font-body antialiased;
     font-size: 1.0625rem;
     line-height: 1.55;
-    /* Data-heavy page: figures must not shift width between values. */
     font-variant-numeric: tabular-nums;
   }
 
-  /* One focus treatment for the whole page. Never removed, only restyled. */
   :focus-visible {
     @apply outline-primary outline-3 outline-offset-3;
   }
 }
 
 @layer components {
-  /* The mono micro-label is the structural device of the page: it marks every
-     value with what it is, the way a spec sheet does. Used often enough in
-     enough places to earn a component class instead of a repeated utility run. */
   .tag {
     @apply font-data text-muted-foreground block text-[0.6875rem] font-medium
       tracking-[0.14em] uppercase;
   }
-}
 
-@layer components {
-  /* The enquiry panel scrolls its own content when it is taller than the
-     viewport. The default scrollbar is a fat grey slab that reads as browser
-     chrome dropped inside a designed panel, so it is thinned and recoloured to
-     the page's own rule colour. scrollbar-gutter keeps the track's width
-     reserved, so content does not shift the moment the bar appears. */
+  /* scrollbar-gutter reserves the track width so content does not shift when
+     the bar appears. */
   .panel-scroll {
     scrollbar-width: thin;
     scrollbar-color: var(--border-strong) transparent;
     scrollbar-gutter: stable;
   }
 
-  /* WebKit still ignores scrollbar-color, so it gets the same treatment. */
+  /* WebKit still ignores scrollbar-color. */
   .panel-scroll::-webkit-scrollbar {
     width: 6px;
   }
@@ -173,8 +132,6 @@
   }
 }
 
-/* The payment rail draws once on load and not at all under reduced motion.
-   It is the only animation on the page. */
 @keyframes rail-draw {
   from {
     transform: scaleX(0);

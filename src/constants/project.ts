@@ -1,8 +1,5 @@
-/**
- * The facts a buyer is actually deciding on. Kept as data, not JSX, so the
- * brokerage can hand a developer one file to update per project — and so the
- * same page can be reused for the next tower without touching a component.
- */
+// Every figure here is illustrative. A real build takes them from the
+// developer's price list; this is the only file that needs to change.
 
 export const PROJECT = {
   name: "Skyline Residences",
@@ -12,11 +9,7 @@ export const PROJECT = {
   handover: { label: "Handover", value: "Q4 2027" },
 } as const;
 
-/**
- * The payment plan. This is the page's central claim and the reason the
- * milestone rail exists — off-plan is bought on a schedule, not a price.
- * `share` values must total 100.
- */
+// `share` values must total 100.
 export const PAYMENT_PLAN = [
   { step: 1, share: 20, label: "On booking", timing: "At reservation" },
   { step: 2, share: 40, label: "During construction", timing: "2026 – 2027, by milestone" },

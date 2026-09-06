@@ -1,13 +1,5 @@
 import { PAYMENT_PLAN } from "@/constants/project";
 
-/**
- * The page's signature element.
- *
- * An off-plan apartment is bought on a schedule, not a price, so the schedule
- * is drawn to scale: each band's width is its share of the total. The numbers
- * carry the information; the bar makes the shape of the commitment readable at
- * a glance.
- */
 export function PaymentRail() {
   const total = PAYMENT_PLAN.reduce((sum, stage) => sum + stage.share, 0);
 
@@ -22,7 +14,6 @@ export function PaymentRail() {
         </p>
       </div>
 
-      {/* Decorative: every value below is stated in text in the list. */}
       <div className="bg-surface border-border-strong mt-5 flex h-3.5 border" aria-hidden="true">
         {PAYMENT_PLAN.map((stage, index) => (
           <span
@@ -36,9 +27,8 @@ export function PaymentRail() {
         ))}
       </div>
 
-      {/* Cells are padded on both sides, not just the right: the dividers are
-          the right border of the previous cell, so without a left inset the
-          next cell's figures sit hard against the rule. */}
+      {/* Padded on both sides: the divider is the previous cell's right border, so
+          without a left inset the next cell's figures sit hard against the rule. */}
       <ol className="border-border mt-5 grid list-none grid-cols-1 border-t sm:grid-cols-3">
         {PAYMENT_PLAN.map((stage) => (
           <li

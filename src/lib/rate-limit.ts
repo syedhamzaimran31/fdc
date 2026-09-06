@@ -6,13 +6,10 @@ interface Bucket {
 }
 
 /**
- * Fixed-window rate limiter held in module memory.
- *
- * Deliberately simple, and deliberately documented as insufficient: it is
- * per-process, so it resets on deploy and does not coordinate across instances.
- * It is here to stop one bored person hammering the public endpoint, not to
- * stop a distributed attack. Before this page runs paid traffic, swap the Map
- * for Upstash Redis — the call signature below does not change.
+ * Per-process and therefore insufficient on its own: it resets on deploy and
+ * does not coordinate across instances. It stops one person hammering the
+ * endpoint, not a distributed attack. Swap the Map for Upstash Redis before
+ * this runs paid traffic — the signatures below do not change.
  */
 const buckets = new Map<string, Bucket>();
 

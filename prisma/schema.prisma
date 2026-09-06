@@ -1,9 +1,3 @@
-// Prisma schema for the Skyline Residences lead capture page.
-//
-// Postgres (Neon / Supabase). Set DATABASE_URL and DIRECT_URL in .env — see
-// .env.example. Migrations are checked into prisma/migrations and applied with
-// `npx prisma migrate deploy`, never generated on the fly at runtime.
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,29 +5,23 @@ generator client {
 datasource db {
   provider = "postgresql"
 
-  // Pooled connection (PgBouncer). Serverless functions open a connection per
-  // invocation, so the app has to go through the pooler or it exhausts the
-  // database's connection limit under any real traffic.
+  // Pooled. Serverless opens a connection per invocation, so without the
+  // pooler the connection limit is exhausted under real traffic.
   url = env("DATABASE_URL")
 
-  // Direct connection, used only by the migration engine. Migrations take
-  // advisory locks and run DDL in a session, neither of which survives a
-  // transaction-mode pooler — through PgBouncer they hang or fail outright.
-  // Falls back to DATABASE_URL when unset, so a non-pooled Postgres needs
-  // only the one variable.
+  // Migrations only. They take advisory locks and run DDL in a session, and
+  // neither survives a transaction-mode pooler. Falls back to DATABASE_URL.
   directUrl = env("DIRECT_URL")
 }
 
-/// Budget bands the brokerage sells against. Stored as an enum rather than a
-/// free-text column so a renamed marketing label can never invalidate history.
+/// An enum, not free text, so a reworded label cannot invalidate history.
 enum BudgetRange {
   AED_900K_1_2M
   AED_1_2M_1_5M
   AED_1_5M_PLUS
 }
 
-/// Where a lead sits in the sales process. The sales team owns this field —
-/// the landing page only ever writes NEW.
+/// Owned by the sales team. The landing page only ever writes NEW.
 enum LeadStatus {
   NEW
   CONTACTED
@@ -44,15 +32,14 @@ enum LeadStatus {
 model Lead {
   id          String      @id @default(cuid())
   name        String      @db.VarChar(80)
-  /// Stored lowercase and trimmed. Not unique: the same buyer legitimately
-  /// enquires twice, and silently rejecting the second attempt would look to
-  /// them like the form is broken. De-duplication is a sales-side decision.
+  /// Deliberately not unique: the same buyer legitimately enquires twice, and
+  /// rejecting the second attempt looks to them like a broken form.
   email       String      @db.VarChar(255)
   phone       String      @db.VarChar(20)
   budgetRange BudgetRange
   status      LeadStatus  @default(NEW)
 
-  /// Attribution captured server-side. Never trusted from the request body.
+  /// Server-side only. Never trusted from the request body.
   source      String?     @db.VarChar(120)
   ipHash      String?     @db.VarChar(64)
 

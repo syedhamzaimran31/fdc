@@ -3,9 +3,11 @@ import { z } from "zod";
 import { BUDGET_RANGE_VALUES } from "@/constants/budget-ranges";
 
 /**
- * One schema, used by the form (via zodResolver) and by the API route.
- * The client gets instant feedback; the server never trusts it and revalidates,
- * because the endpoint is public and can be called without the form.
+ * Used by both the form and the API route. The server revalidates rather than
+ * trusting the client, because the endpoint is public and callable without it.
+ *
+ * Messages are short by design: they render on the label's line, and a wrapped
+ * message changes the field's height.
  */
 export const leadInputSchema = z.object({
   name: z
@@ -28,10 +30,7 @@ export const leadInputSchema = z.object({
   budgetRange: z.enum(BUDGET_RANGE_VALUES, {
     errorMap: () => ({ message: "Choose a band" }),
   }),
-  /**
-   * Honeypot. Real people never see this field, so anything in it is a bot.
-   * Cheap insurance for a public form that feeds a sales team.
-   */
+  /** Honeypot: hidden from people, so anything in it is a bot. */
   company: z.string().optional(),
 });
 

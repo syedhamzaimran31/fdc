@@ -2,12 +2,7 @@ import type { ComponentProps } from "react";
 
 import { cn } from "@/utils/cn";
 
-/**
- * A control ruled on a baseline rather than boxed — a line on a signed
- * document, not a floating field. 2.75rem tall: still a 44px touch target,
- * but tight enough that the value does not float in a void between its label
- * and its rule.
- */
+/** h-11 is deliberate: the 44px touch minimum, and no taller. */
 export function Input({ className, ...props }: ComponentProps<"input">) {
   return (
     <input

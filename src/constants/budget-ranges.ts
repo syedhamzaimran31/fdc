@@ -1,15 +1,9 @@
 /**
- * Budget bands the brokerage sells against.
- *
- * `value` matches the Prisma `BudgetRange` enum exactly and is what gets stored,
- * so it must stay stable. `label` is what the buyer reads and is safe to reword.
- * `short` is used in dense contexts where the full label would wrap.
- *
- * The values are written out here rather than imported from `@prisma/client`
- * on purpose: this module is used by a client component, and pulling the Prisma
- * runtime into the browser bundle to read three strings would be a needless
- * ~100kB. `src/repositories/lead.repository.ts` holds a compile-time assertion
- * so the two lists cannot drift apart.
+ * `value` is stored and must match the Prisma `BudgetRange` enum; `label` is
+ * safe to reword. Written out rather than imported from `@prisma/client`
+ * because a client component uses this, and the Prisma runtime would cost the
+ * browser ~100kB to read three strings. lead.repository.ts asserts at compile
+ * time that the two lists still match.
  */
 export const BUDGET_RANGES = [
   { value: "AED_900K_1_2M", label: "AED 900,000 – 1.2M", short: "900k–1.2M" },

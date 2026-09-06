@@ -3,11 +3,7 @@ import axios, { AxiosError, type AxiosInstance } from "axios";
 import { REQUEST_TIMEOUT_MS } from "@/constants/api";
 import type { ApiResponse } from "@/types/api";
 
-/**
- * Normalised error shape. Every service throws this and nothing else, so hooks
- * and components have exactly one failure type to handle instead of branching
- * on Axios internals.
- */
+/** The only error type services throw, so callers never see an AxiosError. */
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -32,11 +28,7 @@ export const apiClient: AxiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-/**
- * Response interceptor: unwrap the envelope on success, and convert every
- * failure — HTTP error, timeout, offline, malformed body — into one ApiError.
- * Nothing downstream should ever see an AxiosError.
- */
+// Every failure — HTTP, timeout, offline, malformed body — becomes one ApiError.
 apiClient.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
@@ -61,10 +53,6 @@ apiClient.interceptors.response.use(
   },
 );
 
-/**
- * POSTs and unwraps the `{ ok, data }` envelope, so callers get the payload
- * directly and never narrow the union by hand.
- */
 export async function postJson<TData, TBody>(url: string, body: TBody): Promise<TData> {
   const { data } = await apiClient.post<ApiResponse<TData>>(url, body);
 

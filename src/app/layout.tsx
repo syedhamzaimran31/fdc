@@ -7,14 +7,7 @@ import { QueryProvider } from "@/providers/query-provider";
 
 import "./globals.css";
 
-/**
- * Three faces, three jobs. Archivo is tight and engineered, so it carries the
- * headline and the figures. Source Serif reads as document prose. Plex Mono
- * labels every piece of data the way a spec sheet does.
- *
- * next/font self-hosts the files and sets font-display: swap, so there is no
- * render-blocking request to Google and no invisible text on first paint.
- */
+// next/font self-hosts these and sets font-display: swap.
 const archivo = Archivo({
   subsets: ["latin"],
   weight: ["600", "700"],
@@ -60,7 +53,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  // No maximumScale: never take pinch-zoom away from someone who needs it.
+  // No maximumScale: never take pinch-zoom away.
   themeColor: "#e5e6e1",
 };
 

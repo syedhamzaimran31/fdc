@@ -7,16 +7,10 @@ import type { ComponentProps } from "react";
 import { cn } from "@/utils/cn";
 
 /**
- * Radix Select, styled to match the ruled fields.
- *
- * A native <select> cannot be styled consistently across browsers, and its
- * default chrome is a large part of what makes a form read as templated. Radix
- * gives the same keyboard behaviour and aria semantics with the type control
- * the rest of the page needs.
- *
- * Icons are Phosphor, not Lucide — one icon family across the project.
+ * Radix rather than a native select: a native one cannot be styled
+ * consistently across browsers, and its default chrome is a real part of what
+ * reads as templated. Same keyboard behaviour and aria semantics.
  */
-
 export const Select = SelectPrimitive.Root;
 export const SelectValue = SelectPrimitive.Value;
 

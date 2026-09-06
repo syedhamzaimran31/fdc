@@ -48,9 +48,7 @@ export function LeadForm() {
     formState: { errors, isSubmitting, submitCount },
   } = useForm<LeadInput>({
     resolver: zodResolver(leadInputSchema),
-    // Validate when a field is left, not on every keystroke: telling someone
-    // their email is invalid while they are halfway through typing it is
-    // noise, not help.
+    // On blur, not on keystroke: flagging a half-typed email is noise.
     mode: "onTouched",
     defaultValues: { name: "", email: "", phone: "", company: "" },
   });
@@ -59,20 +57,14 @@ export function LeadForm() {
   const showSummary = errorEntries.length > 1;
 
   function onSubmit(values: LeadInput) {
-    // mutate, not mutateAsync: the rejection is already surfaced through
-    // submitLead.isError, and awaiting it here would additionally throw out of
-    // handleSubmit as an unhandled promise rejection.
+    // mutate, not mutateAsync: React Query already surfaces the rejection via
+    // isError, and awaiting it here throws out of handleSubmit unhandled.
     submitLead.mutate(values);
   }
 
-  // With several errors at once, a summary is faster to act on than hunting
-  // down individual fields, so focus moves to it rather than leaving keyboard
-  // and screen reader users sitting on the submit button.
-  //
-  // This runs as an effect keyed on submitCount, not inside the invalid
-  // handler: at handler time React has not committed the summary yet, so
-  // there is nothing to focus. submitCount is in the key so a second failed
-  // submit re-announces instead of going silent.
+  // An effect, not the invalid handler: at handler time React has not committed
+  // the summary yet, so there is nothing to focus. Keyed on submitCount so a
+  // second failed submit re-announces.
   useEffect(() => {
     if (submitCount > 0 && showSummary) summaryRef.current?.focus();
   }, [submitCount, showSummary]);
@@ -180,8 +172,7 @@ export function LeadForm() {
         />
       </Field>
 
-      {/* Radix Select is not a native input, so it is driven by Controller
-          rather than register — the current shadcn form pattern. */}
+      {/* Not a native input, so Controller rather than register. */}
       <Field>
         <FieldHeader>
           <FieldLabel htmlFor="budgetRange" invalid={Boolean(errors.budgetRange)}>
@@ -218,7 +209,6 @@ export function LeadForm() {
         />
       </Field>
 
-      {/* Honeypot: off-screen and untabbable, so only a bot fills it. */}
       <div className="honeypot" aria-hidden="true">
         <label htmlFor="company">Company</label>
         <input id="company" type="text" tabIndex={-1} autoComplete="off" {...register("company")} />

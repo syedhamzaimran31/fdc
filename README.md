@@ -5,7 +5,9 @@ leads for an off-plan Dubai project, backed by Postgres.
 
 A full record of every change and the reasoning behind it is in
 [CHANGELOG.md](./CHANGELOG.md). Parts 2 to 5 of the task are answered at the bottom
-of this file.
+of this file, and also as a Word document in
+[docs/](./docs/FDC-Task-Answers-Parts-2-5.docx) for anyone who would rather not read
+it on GitHub.
 
 ## Run it
 

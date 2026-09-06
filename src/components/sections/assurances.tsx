@@ -1,13 +1,5 @@
 import { ASSURANCES } from "@/constants/project";
 
-/**
- * The three objections that stop a Dubai off-plan enquiry, answered before the
- * form rather than after it. A ruled definition list, not cards — these are
- * clauses, and clauses do not need boxes.
- *
- * Label and body share a top baseline in every row, which is what keeps the
- * two columns reading as one document.
- */
 export function Assurances() {
   return (
     <section aria-labelledby="assurances-heading">

@@ -6,23 +6,9 @@ import { Thesis } from "@/components/sections/thesis";
 import { PROJECT } from "@/constants/project";
 
 /**
- * Server component. Only the enquiry form is interactive, so it is the only
- * thing that ships JavaScript.
- *
- * Layout: one shell width and one gutter, used by the masthead, the grid and
- * the colophon alike, so the three bands can never drift out of alignment.
- *
- * The two-column split starts at xl (1280px), not lg. Between 1024 and 1280
- * both columns end up too narrow — the headline wraps to four lines and the
- * rail labels break — so mid-size laptops get the full-width stacked layout
- * instead, with the form still first.
- *
- * At xl the split is 1fr / clamp(28rem, 34vw, 34rem). The form is the page's
- * entire purpose, so it gets a fixed comfortable measure and the prose column
- * absorbs the remaining width — not the other way round.
- *
- * While stacked, the sheet is capped at 36rem and centred: a four-field form
- * stretched across a 1000px viewport is unusable, however much room there is.
+ * The two-column split starts at xl, not lg: between 1024 and 1280 both
+ * columns are too narrow — the headline wraps to four lines and the rail
+ * labels break — so mid-size gets the stacked layout with the form first.
  */
 export default function HomePage() {
   return (
@@ -54,8 +40,6 @@ export default function HomePage() {
         className="mx-auto grid max-w-shell grid-cols-1 gap-x-16 gap-y-10 px-5 pt-8 pb-16 sm:px-8
           xl:grid-cols-[minmax(0,1fr)_clamp(28rem,34vw,34rem)] lg:gap-y-12 lg:pt-12 lg:pb-20"
       >
-        {/* One rhythm between sections, rather than each section inventing its
-            own top margin. */}
         <div className="space-y-10 xl:space-y-12">
           <Thesis />
           <PaymentRail />
@@ -64,15 +48,9 @@ export default function HomePage() {
         </div>
 
         {/*
-          row-start-1 on mobile: the form is why the page exists, so a phone
-          user should not scroll past the whole prospectus to reach it.
-
-          On desktop the panel is sticky. It is also capped to the viewport and
-          given its own scroll container, so a form taller than the screen stays
-          fully reachable instead of having its submit button stranded below the
-          fold. overscroll-contain stops that inner scroll from chaining into
-          the page once it bottoms out, which is what makes the pointer scroll
-          the form when it is over the form, and the page everywhere else.
+          Capped to the viewport with its own scroll container, so a form taller
+          than the screen stays reachable instead of stranding the submit button.
+          overscroll-contain stops that inner scroll chaining into the page.
         */}
         <div
           className="panel-scroll row-start-1 xl:row-start-auto xl:sticky xl:top-8 xl:-mt-9

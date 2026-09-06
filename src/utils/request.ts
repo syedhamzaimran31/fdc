@@ -1,10 +1,4 @@
-/**
- * Best-effort client IP from the proxy headers the host sets.
- *
- * `x-forwarded-for` is a comma-separated chain; the first entry is the original
- * client and the rest are proxies. It is spoofable, so it is used for rate
- * limiting and coarse attribution only — never for authorisation or identity.
- */
+/** Spoofable, so this is for rate limiting only — never for authorisation. */
 export function getClientIp(request: Request): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
   const first = forwardedFor?.split(",")[0]?.trim();

@@ -7,25 +7,16 @@ import { prisma } from "@/lib/prisma";
 import type { Lead, LeadCreateInput } from "@/types/lead";
 
 /**
- * Compile-time guard that the hand-written budget values in
- * `src/constants/budget-ranges.ts` are exactly the Prisma enum members.
- *
- * These two assignments are erased at build time and cost nothing at runtime,
- * but if anyone adds a band to one list and forgets the other, `tsc` fails
- * here instead of Postgres rejecting the insert in production.
+ * Erased at build time. Its only job is to fail `tsc` if the hand-written
+ * budget values and the Prisma enum ever drift apart, rather than letting
+ * Postgres reject the insert in production.
  */
 const _budgetMatchesPrisma: PrismaBudgetRange = null as unknown as BudgetRange;
 const _prismaMatchesBudget: BudgetRange = null as unknown as PrismaBudgetRange;
 void _budgetMatchesPrisma;
 void _prismaMatchesBudget;
 
-/**
- * The only module that talks to the database about leads.
- *
- * Everything above it — the route, the service, the form — deals in plain
- * types and has no idea Prisma exists. Moving the brokerage onto a CRM means
- * rewriting this file and nothing else.
- */
+/** The only module that touches Prisma. Swapping in a CRM is this file alone. */
 export const leadRepository = {
   async create(input: LeadCreateInput): Promise<Lead> {
     const lead = await prisma.lead.create({
@@ -42,7 +33,6 @@ export const leadRepository = {
     return lead as Lead;
   },
 
-  /** Used by the sales tooling, not the landing page. */
   async listRecent(limit = 50): Promise<Lead[]> {
     const leads = await prisma.lead.findMany({
       orderBy: { createdAt: "desc" },

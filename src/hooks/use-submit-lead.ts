@@ -7,7 +7,6 @@ import { leadsService } from "@/services/leads.service";
 import type { LeadInput } from "@/schemas/lead.schema";
 import type { SubmitLeadResult } from "@/types/api";
 
-/** Components consume this hook; they never call axios or the service directly. */
 export function useSubmitLead() {
   return useMutation<SubmitLeadResult, ApiError, LeadInput>({
     mutationFn: (input) => leadsService.submit(input),
