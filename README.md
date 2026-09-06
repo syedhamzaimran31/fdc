@@ -220,7 +220,7 @@ not working without them:
 | No validation anywhere | `/api/lead` accepted any JSON at all. | One Zod schema for the form and the route. The server revalidates; it never trusts the client. |
 | No `type`, `inputMode` or `autoComplete` | Mobile users got a QWERTY keyboard for a phone number. On a mobile-first lead page that costs conversions. | Semantic input types and autocomplete hints. |
 | Missing SEO metadata | No canonical, no Open Graph. Shared into WhatsApp with no preview. | Full metadata driven from `config/site.ts`. |
-| No spam protection or rate limiting on a public endpoint | Public lead forms get found within days. | Honeypot (bots get a `202` and learn nothing) plus a fixed-window rate limit. |
+| No spam protection or rate limiting on a public endpoint | Public lead forms get found within days. | Honeypot plus a fixed-window rate limit. A hit is stored and flagged UNQUALIFIED, never discarded. |
 
 Also: emails are trimmed and lowercased on the way in, and `id`, `createdAt`,
 `status`, `source` and `ipHash` are all assigned server-side, never by the client.
@@ -418,7 +418,8 @@ running them rather than reading them:
    `z.string().max(0)`, so a bot that filled the trap got a `422` naming the exact field
    to leave empty next time. I caught it by POSTing to the endpoint with the honeypot
    filled and reading the actual response body rather than assuming the shape. Now it
-   returns `202` and silently discards.
+   returned `202` and silently discarded — which turned out to be the wrong shape
+   of fix entirely, see below.
 
 There is a fifth that is not about code. Setting up Neon, the connection string went
 into `.env.example` — which is committed. I checked `git log -S` before committing:

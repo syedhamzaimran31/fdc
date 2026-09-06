@@ -55,27 +55,34 @@ export async function POST(request: Request): Promise<LeadResponse> {
     );
   }
 
-  const { company, ...lead } = parsed.data;
+  const { referenceCode, ...lead } = parsed.data;
 
-  // Honeypot filled in: accept silently so a bot learns nothing from the
-  // response, but never write it to the list the sales team works from.
-  if (company) {
-    logger.info(SCOPE, "honeypot triggered", { ipHash: hashIp(clientIp) });
-    return NextResponse.json(
-      { ok: true, data: { id: "ignored" } },
-      { status: HTTP_STATUS.ACCEPTED },
-    );
-  }
+  /*
+   * Honeypot filled in. This used to discard the submission outright, which
+   * meant one false positive destroyed a real buyer with no trace — and that
+   * is exactly what happened once Chrome started autofilling the trap field.
+   *
+   * A spam heuristic on a lead form has to fail towards keeping the lead. It
+   * is stored, flagged UNQUALIFIED so it never reaches the NEW queue the sales
+   * team works from, and the response is identical to a normal one so a bot
+   * learns nothing.
+   */
+  const suspectedBot = Boolean(referenceCode);
 
   try {
     const saved = await leadRepository.create({
       ...lead,
       source: request.headers.get("referer") ?? undefined,
       ipHash: clientIp === "unknown" ? undefined : hashIp(clientIp),
+      status: suspectedBot ? "UNQUALIFIED" : "NEW",
     });
 
     // Log the id and the band, never the buyer's contact details.
-    logger.info(SCOPE, "lead captured", { leadId: saved.id, budgetRange: saved.budgetRange });
+    logger.info(SCOPE, suspectedBot ? "honeypot triggered, lead flagged" : "lead captured", {
+      leadId: saved.id,
+      budgetRange: saved.budgetRange,
+      status: saved.status,
+    });
 
     return NextResponse.json({ ok: true, data: { id: saved.id } }, { status: HTTP_STATUS.CREATED });
   } catch (error) {

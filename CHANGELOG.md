@@ -286,7 +286,8 @@ Each of these passed `typecheck`, `lint` and `build` first.
 3. **Unhandled promise rejection on failed submit.** `mutateAsync` rethrows out of
    `handleSubmit`; React Query already surfaces the error, so `mutate` is correct.
 4. **The honeypot was teaching bots to pass.** `z.string().max(0)` returned a `422`
-   naming the trap field. Now `202` and silently discarded.
+   naming the trap field. Fixed to accept silently — and then fixed properly
+   again in §11, because silent discarding was itself the bug.
 5. **Tailwind compiling the wrong project's classes** — §5 above.
 
 ---
@@ -299,7 +300,7 @@ Each of these passed `typecheck`, `lint` and `build` first.
   confirmation matched the row id. Email arrived trimmed and lowercased,
   `budgetRange` stored as the enum, `status` `NEW`, `source` and a 64-char `ipHash`
   stamped server-side.
-- **Edge cases against the live database:** honeypot → `202`, nothing written;
+- **Edge cases against the live database:** honeypot → stored and flagged;
   invalid → `422` with per-field errors; rate limit → `201` ×5 then `429`.
 - **12 concurrent POSTs** against the original file store → 12 stored, none lost.
 - Layout measured at 375, 1040, 1100, 1300 and 1440px.
@@ -332,6 +333,44 @@ being saved. If it is ever on in production it is obvious immediately.
 Verified both ways: built and run with `.env` removed — banner shown, form
 submits, no 500, warning logged; then restored — banner gone, lead written to
 Neon.
+
+---
+
+## 11. The honeypot was eating real leads
+
+Found on the deployed site. A genuine submission came back showing
+`Reference: IGNORED` and never reached the database.
+
+**Cause.** The honeypot input was `id="company"` with a label reading "Company".
+Chrome maps that to the *organisation* field of a saved address profile and
+autofills it — `autocomplete="off"` does not reliably stop Chrome for profile
+fields, and `aria-hidden` and `tabindex="-1"` do not stop it at all. Any visitor
+with a saved Chrome profile was silently classified as a bot.
+
+Reproduced against production: an identical POST with `company` set returned
+`202 {"id":"ignored"}` and wrote nothing, while the same POST without it
+returned `201` and a real id. So the deployment and the database were never the
+problem.
+
+**Two fixes, because there were two mistakes.**
+
+1. The trap is renamed to `referenceCode`, which maps to nothing in Chrome's
+   autofill vocabulary. The form now contains no field matching
+   company / organisation / address for autofill to aim at.
+
+2. More importantly, a honeypot hit is no longer discarded. It is stored with
+   `status: UNQUALIFIED`, so it never reaches the NEW queue the sales team works
+   from, and the response is identical to a normal one so a bot still learns
+   nothing. The enum already had `UNQUALIFIED`, so no migration was needed.
+
+The second one is the real lesson. A spam heuristic on a lead-capture form has
+to fail towards *keeping* the lead: a false positive costs a customer, and
+silent deletion means nobody ever finds out it happened. This was the same
+silent-loss failure as §1.1 — reintroduced, ironically, by code written to
+protect the lead list.
+
+Verified: a POST carrying the old `company` field is now stored as `NEW`, a POST
+carrying `referenceCode` is stored as `UNQUALIFIED`, and nothing is dropped.
 
 ---
 

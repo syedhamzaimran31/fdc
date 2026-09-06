@@ -11,6 +11,8 @@ export interface LeadCreateInput {
   budgetRange: BudgetRange;
   source?: string;
   ipHash?: string;
+  /** Defaults to NEW. Set to UNQUALIFIED for suspected spam. */
+  status?: LeadStatus;
 }
 
 /** A lead as it comes back from the database. */

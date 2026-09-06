@@ -37,6 +37,7 @@ export const leadRepository = {
         budgetRange: input.budgetRange,
         source: input.source ?? null,
         ipHash: input.ipHash ?? null,
+        status: input.status ?? "NEW",
       },
     });
 

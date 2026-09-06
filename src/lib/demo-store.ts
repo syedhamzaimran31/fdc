@@ -53,7 +53,7 @@ export const demoStore = {
       email: input.email,
       phone: input.phone,
       budgetRange: input.budgetRange,
-      status: "NEW",
+      status: input.status ?? "NEW",
       source: input.source ?? null,
       ipHash: input.ipHash ?? null,
       createdAt: now,

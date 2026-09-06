@@ -50,7 +50,7 @@ export function LeadForm() {
     resolver: zodResolver(leadInputSchema),
     // On blur, not on keystroke: flagging a half-typed email is noise.
     mode: "onTouched",
-    defaultValues: { name: "", email: "", phone: "", company: "" },
+    defaultValues: { name: "", email: "", phone: "", referenceCode: "" },
   });
 
   const errorEntries = Object.entries(errors).filter(([key]) => key in FIELD_LABELS);
@@ -209,9 +209,18 @@ export function LeadForm() {
         />
       </Field>
 
+      {/* Honeypot. The name must not map to a Chrome autofill profile field:
+          "company" did, so Chrome filled it from the visitor's saved profile
+          and real submissions were being flagged as bots. */}
       <div className="honeypot" aria-hidden="true">
-        <label htmlFor="company">Company</label>
-        <input id="company" type="text" tabIndex={-1} autoComplete="off" {...register("company")} />
+        <label htmlFor="referenceCode">Reference code</label>
+        <input
+          id="referenceCode"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          {...register("referenceCode")}
+        />
       </div>
 
       <Button className="mt-7" type="submit" disabled={isBusy}>
