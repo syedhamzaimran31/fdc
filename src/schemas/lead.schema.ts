@@ -30,11 +30,7 @@ export const leadInputSchema = z.object({
   budgetRange: z.enum(BUDGET_RANGE_VALUES, {
     errorMap: () => ({ message: "Choose a band" }),
   }),
-  /**
-   * Honeypot. Deliberately NOT named company / organisation / address: Chrome
-   * maps those to a saved profile and autofills them even with
-   * autocomplete="off", which flags real buyers as bots.
-   */
+  
   referenceCode: z.string().optional(),
 });
 

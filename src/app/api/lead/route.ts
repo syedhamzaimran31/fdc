@@ -57,16 +57,7 @@ export async function POST(request: Request): Promise<LeadResponse> {
 
   const { referenceCode, ...lead } = parsed.data;
 
-  /*
-   * Honeypot filled in. This used to discard the submission outright, which
-   * meant one false positive destroyed a real buyer with no trace — and that
-   * is exactly what happened once Chrome started autofilling the trap field.
-   *
-   * A spam heuristic on a lead form has to fail towards keeping the lead. It
-   * is stored, flagged UNQUALIFIED so it never reaches the NEW queue the sales
-   * team works from, and the response is identical to a normal one so a bot
-   * learns nothing.
-   */
+
   const suspectedBot = Boolean(referenceCode);
 
   try {
